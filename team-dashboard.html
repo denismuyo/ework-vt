@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>VT Team Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Additional styles for Team Dashboard */
+    .summary {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .summary-card {
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 15px 25px;
+      min-width: 150px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+
+    .progress-bar {
+      background: rgba(255,255,255,0.2);
+      border-radius: 12px;
+      width: 100%;
+      height: 15px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      background: #00f2fe;
+      height: 100%;
+      width: 0%;
+      transition: width 0.5s;
+    }
+
+    .task-card {
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 15px 20px;
+      margin: 10px 0;
+      width: 80%;
+      max-width: 700px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .task-card div {
+      margin-bottom: 5px;
+    }
+
+    .badge {
+      font-weight: bold;
+      padding: 3px 8px;
+      border-radius: 8px;
+      color: #fff;
+    }
+
+  </style>
+</head>
+<body>
+
+<h2>VT Team Dashboard</h2>
+
+<!-- Summary Section -->
+<div class="summary">
+  <div class="summary-card">
+    <p>Total Tasks</p>
+    <h3 id="totalTasks">0</h3>
+  </div>
+  <div class="summary-card">
+    <p>Completed</p>
+    <h3 id="completedTasks">0</h3>
+  </div>
+  <div class="summary-card">
+    <p>Pending</p>
+    <h3 id="pendingTasks">0</h3>
+  </div>
+  <div class="summary-card">
+    <p>Progress</p>
+    <div class="progress-bar">
+      <div id="progressFill" class="progress-fill"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Tasks Section -->
+<h3 style="margin-top:30px;">All Tasks</h3>
+<div id="allTasks"></div>
+
+<script>
+let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+
+// Map status to colors
+const statusColors = {
+  "Assigned": "#2196F3",
+  "Submitted": "#FFC107",
+  "Done": "#4CAF50",
+  "Overdue": "#FF4C4C"
+};
+
+// Map priority to colors
+const priorityColors = {
+  "High": "#FF4C4C",
+  "Medium": "#FFB74D",
+  "Low": "#81C784"
+};
+
+// Load dashboard
+function loadDashboard(){
+  const total = tasks.length;
+  const completed = tasks.filter(t => t.status === "Done").length;
+  const pending = tasks.filter(t => t.status !== "Done").length;
+  const progressPercent = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+  document.getElementById("totalTasks").innerText = total;
+  document.getElementById("completedTasks").innerText = completed;
+  document.getElementById("pendingTasks").innerText = pending;
+  document.getElementById("progressFill").style.width = progressPercent + "%";
+
+  const allTasksDiv = document.getElementById("allTasks");
+  allTasksDiv.innerHTML = "";
+
+  const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+
+  tasks.forEach((t,index)=>{
+    // Check if overdue
+    let status = t.status;
+    if(t.status !== "Done" && t.deadline < today){
+      status = "Overdue";
+    }
+
+    allTasksDiv.innerHTML += `
+      <div class="task-card">
+        <div>
+          <p><strong>${t.title}</strong></p>
+          <p>Assigned to: ${t.person}</p>
+          <p>Deadline: ${t.deadline}</p>
+          <p>Priority: <span class="badge" style="background:${priorityColors[t.priority]}">${t.priority}</span></p>
+          <p>Status: <span class="badge" style="background:${statusColors[status]}">${status}</span></p>
+          <p>Submission: ${t.submission || "Not submitted"}</p>
+        </div>
+        <div>
+          ${t.status !== "Done" ? `<button onclick="markDone(${index})">Mark Done</button>` : ""}
+        </div>
+      </div>
+    `;
+  });
+}
+
+// Mark task done (CEO or team members)
+function markDone(index){
+  tasks[index].status = "Done";
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  loadDashboard();
+}
+
+// Initial load
+loadDashboard();
+</script>
+
+</body>
+</html>
