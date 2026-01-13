@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>VT Platform Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family:'Montserrat',sans-serif; display:flex; justify-content:center; align-items:center; height:100vh; background:#e0f0ff; }
+    .login-box { background:#fff; padding:40px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); width:300px; text-align:center; }
+    input { width:100%; padding:10px; margin:10px 0; border-radius:8px; border:1px solid #ccc; }
+    button { width:100%; padding:10px; border:none; border-radius:8px; background:linear-gradient(90deg,#0072ff,#00c6ff); color:#fff; font-weight:600; cursor:pointer; transition: background 0.3s; }
+    button:hover { background:linear-gradient(90deg,#005fcc,#00bfff); }
+    h2 { margin-bottom:20px; color:#0072ff; }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>VT Platform Login</h2>
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+  </div>
+
+<script>
+const users = {
+  "denis": { 
+    name:"Denis", 
+    role:"CEO", 
+    page:"ceo.html", 
+    password:"123",
+    pic:"images/denis.jpg"
+  },
+
+  "dominic": { 
+    name:"Dominic", 
+    role:"Finance & Research", 
+    page:"dominic.html", 
+    password:"123",
+    pic:"images/dominic.jpeg"
+  },
+
+  "anne": { 
+    name:"Anne", 
+    role:"Linkages & Marketing", 
+    page:"anne.html", 
+    password:"123",
+    pic:"images/anne.jpeg"
+  },
+
+  "mary": { 
+    name:"Mary", 
+    role:"Communication & PR", 
+    page:"mary.html", 
+    password:"123",
+    pic:"images/mary.jpeg"
+  }
+};
+
+
+function login() {
+  const username = document.getElementById("username").value.toLowerCase();
+  const password = document.getElementById("password").value;
+
+  if(users[username] && users[username].password === password){
+    // store logged-in user info
+    localStorage.setItem("loggedInUser", JSON.stringify(users[username]));
+    // redirect to team dashboard
+    window.location.href = "team-dashboard.html";
+  } else {
+    alert("Invalid username or password");
+  }
+}
+</script>
+</body>
+</html>
